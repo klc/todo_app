@@ -19,32 +19,8 @@ class DeveloperRepository extends ServiceEntityRepository
         parent::__construct($registry, Developer::class);
     }
 
-    // /**
-    //  * @return Developer[] Returns an array of Developer objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function findDevelopers()
     {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('d.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        return $this->findBy([], ['efficiency' => 'DESC']);
     }
-    */
-
-    /*
-    public function findOneBySomeField($value): ?Developer
-    {
-        return $this->createQueryBuilder('d')
-            ->andWhere('d.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
-    */
 }

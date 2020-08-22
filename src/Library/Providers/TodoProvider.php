@@ -29,26 +29,29 @@ abstract class TodoProvider
     private $httpMethod;
 
     /**
-     * @return void
+     * @var array $mappedData
      */
-    abstract public function handle(): void;
+    private $mappedData;
+
+    /**
+     * TodoProvider constructor.
+     * @param HttpClientInterface $httpClient
+     */
+    public function __construct(HttpClientInterface $httpClient)
+    {
+        $this->client = $httpClient;
+    }
 
     /**
      * @return void
      */
-    private function setClient(): void
-    {
-        $this->client = HttpClient::create();
-    }
+    abstract public function handle(): void;
 
     /**
      * @return HttpClientInterface
      */
     private function getClient(): HttpClientInterface
     {
-        if (!$this->client) {
-            $this->setClient();
-        }
 
         return $this->client;
     }
@@ -111,5 +114,28 @@ abstract class TodoProvider
     protected function getHttpMethod(): string
     {
         return $this->httpMethod;
+    }
+
+    /**
+     * @param string $name
+     * @param int $level
+     * @param int $estimatedDuration
+     * @return void
+     */
+    protected function addTodo(string $name, int $level, int $estimatedDuration): void
+    {
+        $this->mappedData[] = [
+            'name' => $name,
+            'level' => $level,
+            'estimated_duration' => $estimatedDuration
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getMappedData(): array
+    {
+        return $this->mappedData;
     }
 }

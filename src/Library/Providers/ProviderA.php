@@ -4,44 +4,31 @@
 namespace App\Library\Providers;
 
 
-use App\Entity\Task;
-use Doctrine\ORM\EntityManagerInterface;
-
 class ProviderA extends TodoProvider implements TodoProviderInterface
 {
     const API_URL = 'http://www.mocky.io/v2/5d47f24c330000623fa3ebfa';
     const HTTP_METHOD = 'GET';
 
     /**
-     * @var EntityManagerInterface $entityManager
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     * @return void
      */
-    private $manager;
-
-    public function __construct(EntityManagerInterface $manager)
+    public function handle(): void
     {
         $this->setApiUrl(self::API_URL);
         $this->setHttpMethod(self::HTTP_METHOD);
-        $this->manager = $manager;
-    }
 
-    public function handle(): void
-    {
-        try {
-            $todoData = $this->getTodoData();
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
-
-
+        $todoData = $this->getTodoData();
         foreach ($todoData as $todoDatum) {
-            $task = new Task();
-            $task->setName($todoDatum['id']);
-            $task->setLevel($todoDatum['zorluk']);
-            $task->setEstimatedDuration($todoDatum['sure']);
-            $task->setCost($task->getEstimatedDuration() * $task->getLevel());
-            $this->manager->persist($task);
+            $this->addTodo(
+                $todoDatum['id'],
+                $todoDatum['zorluk'],
+                $todoDatum['sure']
+            );
         }
-
-        $this->manager->flush();
     }
 }

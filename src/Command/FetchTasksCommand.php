@@ -13,6 +13,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class FetchTasksCommand extends Command
 {
@@ -23,10 +25,16 @@ class FetchTasksCommand extends Command
      */
     private $manager;
 
-    public function __construct(EntityManagerInterface $manager)
+    /**
+     * @var HttpClientInterface $httpClient
+     */
+    private $httpClient;
+
+    public function __construct(EntityManagerInterface $manager, HttpClientInterface $httpClient)
     {
-        $this->manager = $manager;
         parent::__construct();
+        $this->manager = $manager;
+        $this->httpClient = $httpClient;
     }
 
     protected function configure()
@@ -40,9 +48,9 @@ class FetchTasksCommand extends Command
 
         $io->note('Start fetching tasks');
 
-        $fetchTask = new FetchTasks();
-        $fetchTask->addTodoProvider(new ProviderA($this->manager))
-            ->addTodoProvider(new ProviderB($this->manager))
+        $fetchTask = new FetchTasks($this->manager);
+        $fetchTask->addTodoProvider(new ProviderA($this->httpClient))
+            ->addTodoProvider(new ProviderB($this->httpClient))
             ->handle();
 
         $io->success('Finished fetching');

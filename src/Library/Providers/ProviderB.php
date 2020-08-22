@@ -4,9 +4,6 @@
 namespace App\Library\Providers;
 
 
-use App\Entity\Task;
-use Doctrine\ORM\EntityManagerInterface;
-
 class ProviderB extends TodoProvider implements TodoProviderInterface
 {
 
@@ -14,36 +11,27 @@ class ProviderB extends TodoProvider implements TodoProviderInterface
     const HTTP_METHOD = 'GET';
 
     /**
-     * @var EntityManagerInterface $entityManager
+     * @throws \Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface
+     * @throws \Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface
+     * @return void
      */
-    private $manager;
-
-    public function __construct(EntityManagerInterface $manager)
+    public function handle(): void
     {
         $this->setApiUrl(self::API_URL);
         $this->setHttpMethod(self::HTTP_METHOD);
-        $this->manager = $manager;
-    }
 
-    public function handle(): void
-    {
-        try {
-            $todoData = $this->getTodoData();
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage());
-        }
-
+        $todoData = $this->getTodoData();
         foreach ($todoData as $todoDatum) {
             foreach ($todoDatum as $name => $datum) {
-                $task = new Task();
-                $task->setName($name);
-                $task->setLevel($datum['level']);
-                $task->setEstimatedDuration($datum['estimated_duration']);
-                $task->setCost($task->getEstimatedDuration() * $task->getLevel());
-                $this->manager->persist($task);
+                $this->addTodo(
+                    $name,
+                    $datum['level'],
+                    $datum['estimated_duration']
+                );
             }
         }
-
-        $this->manager->flush();
     }
 }
