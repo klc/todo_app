@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello TodoListController!{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row">
+        <h4>Tüm tasklar tahmini olarak {{ weekCount }} hafta içinde bitecek.</h4>
+    </div>
+    <div class="row">
+        {% for developer in developers %}
+            <div class="col border m-1">
+                <div class="row p-1 border bg bg-info">
+                    <b>{{ developer.name }}</b>
+                </div>
+                {% for number, week in developer.tasks %}
+                    <div class="row p-1 border bg bg-warning">
+                        <b>Hafta {{ number }}</b>
+                    </div>
+                    {% for task in week.tasks %}
+                        <div class="row p-1 border">
+                            <p>{{ task.name }} <span></span></p>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
